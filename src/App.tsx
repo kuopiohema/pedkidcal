@@ -1,4 +1,5 @@
 import './app.css';
+import { useTranslation } from 'react-i18next';
 import {
     useMediaQuery,
     ThemeProvider,
@@ -27,8 +28,13 @@ import { useState, useEffect, useMemo } from 'react';
 import * as themes from './theme';
 import { Fields, fieldIndices, getConvertedValue } from './fields';
 import UnitSelectInput from './components/UnitSelectInput';
+import { LanguageSelect } from './components/LanguageSelect';
+//import { LanguageSelect } from './components/LanguageSelect';
 
 function App() {
+    // I18N
+    const { t } = useTranslation();
+
     // Theme
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const [darkMode, setDarkMode] = useState(false);
@@ -123,8 +129,9 @@ function App() {
                 <Toolbar>
                     <CalculateIcon />
                     <Typography variant="h6" component="div" sx={{ paddingLeft: '10px', flexGrow: 1 }}>
-                        KidCal - Kidney Function Calculator
+                        {t('title')}
                     </Typography>
+                    
                     <Tooltip title={`Switch to ${darkMode ? 'light' : 'dark'} mode`}>
                         <IconButton size="large" edge="start" color="inherit" onClick={() => setDarkMode(!darkMode)}>
                             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -137,6 +144,7 @@ function App() {
                 <Stack spacing={4}>
                     <Paper elevation={2} sx={{ p: 4 }}>
                         <Stack spacing={2}>
+                            <LanguageSelect />
                             <FormControl>
                                 <FormLabel sx={{ '&.Mui-focused': { color: `${theme.palette.text.secondary}` } }}>Gender</FormLabel>
                                 <RadioGroup

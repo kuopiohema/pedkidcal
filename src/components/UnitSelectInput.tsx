@@ -1,29 +1,28 @@
-import { Stack, TextField, InputAdornment, ToggleButtonGroup, ToggleButtonGroupProps, TextFieldProps, ToggleButton } from "@mui/material";
+import { Stack, TextField, InputAdornment, FormControlLabel, Radio, RadioGroup, StandardTextFieldProps } from "@mui/material";
 import React from "react";
-import { UnitList } from '../utils';
+import { Unit } from '../fields';
 
-interface UnitSelection {
-    units: UnitList;
-    selectedIndex: number;
-    onUnitChange: (e: React.MouseEvent) => void;
+interface UnitSelectInputProps extends StandardTextFieldProps {
+    units: Unit[];
+    unitIndex: number;
+    onUnitChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-type UnitSelectInputProps = UnitSelection & ToggleButtonGroupProps & TextFieldProps;
-
 function UnitSelectInput(props: UnitSelectInputProps) {
-    const buttons = Object.entries(props.units).map((unit, index) =>
-        <ToggleButton value={index}>{unit}</ToggleButton>
+    const options = props.units.map((unit, index) =>
+        <FormControlLabel key={unit.id} value={index} control={<Radio />} label={unit.label} />
     );
+    const { units, unitIndex, onUnitChange, ...textFieldProps } = props;
 
     return (
         <Stack direction="row" spacing={2}>
             <TextField
-                InputProps={{endAdornment: <InputAdornment position="end">{props.units[props.selectedIndex]}</InputAdornment>}}
-                {...props}
+                InputProps={{endAdornment: <InputAdornment position="end">{props.units[props.unitIndex].label}</InputAdornment>}}
+                {...textFieldProps}
             />
-            <ToggleButtonGroup value={props.selectedIndex} onChange={props.onUnitChange} exclusive>
-                {buttons}
-            </ToggleButtonGroup>
+            <RadioGroup value={props.unitIndex} onChange={props.onUnitChange} row>
+                {options}
+            </RadioGroup>
         </Stack>
     );
 }

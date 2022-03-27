@@ -9,25 +9,23 @@ import {
     IconButton,
     Container,
     Stack,
-    TextField,
-    InputAdornment,
-    Select,
-    MenuItem,
-    InputLabel,
     FormControl,
     Paper,
     Tooltip,
     Link,
-    Button
+    Button,
+    FormLabel,
+    FormControlLabel,
+    Radio,
+    RadioGroup
 } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import CalculateIcon from '@mui/icons-material/Calculate';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useState, useEffect, useMemo } from 'react';
 import * as themes from './theme';
-import { regex, conversions, calculatedValueToString, NumberInputs, Units } from './utils';
+import { Fields, fieldIndices, getConvertedValue } from './fields';
 import UnitSelectInput from './components/UnitSelectInput';
 
 function App() {
@@ -36,145 +34,90 @@ function App() {
     const [darkMode, setDarkMode] = useState(false);
     useEffect(() => { setDarkMode(prefersDarkMode); }, [prefersDarkMode]);
 
-    // Input variables
-    const [crea, setCrea] = useState({ umoll: '', mgdl: '' }); // Creatinine
-    const [creaUnit, setCreaUnit] = useState(Units.crea.umol);
-    const [urea, setUrea] = useState({ mmoll: '', mgdl: '' }); // Urea/BUN
-    const [cysc, setCysc] = useState(''); // Cystatin C in mg/l
-    const [height, setHeight] = useState({ cm: '', in: '' }); // height
-    const [gender, setGender] = useState<number | string>(''); // gender (0 = female, 1 = male)
+    const theme = useMemo(() => darkMode ? themes.dark : themes.light, [darkMode]);
 
-    const handleChange = (input: string, value: NumberInputs, unit: string) => {
+    // Number inputs
+    const [values, setValues] = useState(Array(Fields.length).fill(''));
+    const [unitIndices, setUnitIndices] = useState(Array(Fields.length).fill('0'));
+    
+    // Non-number inputs
+    const [gender, setGender] = useState<string>(''); // gender (0 = female, 1 = male)
+
+    const handleValueChange = (value: string, fieldIndex: number) => {
         // replace commas with dots
-        input = input.replace(',', '.');
+        value = value.replace(',', '.');
 
         // check if input is a valid number, abort if it isn't
-        if (!regex.number.test(input))
+        if (!(/^\d*\.?\d*$/.test(value)))
             return;
 
-        // does original input end in '.'?
-        const hasFinalDot = regex.finalDot.test(input);
-
-        // convert to float - this should always work due to above check
-        // note: empty string and "." get parsed to "NaN", this is taken care of later
-        const inputValue = Number.parseFloat(input);
-
-        switch (value) {
-            case NumberInputs.Crea: {
-                let umolString = '';
-                let mgdlString = '';
-                if (unit === Units.crea.umol) {
-                    let umol = inputValue;
-                    let mgdl = inputValue * conversions.crea.umolToMg;
-
-                    umolString = calculatedValueToString(umol, true, hasFinalDot);
-                    mgdlString = calculatedValueToString(mgdl, false, hasFinalDot);
-                }
-                if (unit === Units.crea.mgdl) {
-                    let umol = inputValue * conversions.crea.mgToUmol;
-                    let mgdl = inputValue;
-
-                    umolString = calculatedValueToString(umol, false, hasFinalDot);
-                    mgdlString = calculatedValueToString(mgdl, true, hasFinalDot);
-                }
-
-                setCrea({ umoll: umolString, mgdl: mgdlString });
-                break;
-            }
-            case NumberInputs.Urea: {                
-                let mmolString = '';
-                let mgdlString = '';
-                if (unit === Units.urea.mmol) {
-                    let mmol = inputValue;
-                    let mgdl = inputValue * conversions.urea.mmolToMg;
-
-                    mmolString = calculatedValueToString(mmol, true, hasFinalDot);
-                    mgdlString = calculatedValueToString(mgdl, false, hasFinalDot);
-                }
-                if (unit === Units.urea.mgdl) {
-                    let mmol = inputValue * conversions.urea.mgToMmol;
-                    let mgdl = inputValue;
-
-                    mmolString = calculatedValueToString(mmol, false, hasFinalDot);
-                    mgdlString = calculatedValueToString(mgdl, true, hasFinalDot);
-                }
-
-                setUrea({ mmoll: mmolString, mgdl: mgdlString });
-                break;
-            }
-            case NumberInputs.CysC: {
-                if (!(unit === Units.cysc.mgl))
-                    return;
-                const mglString = calculatedValueToString(inputValue, true, hasFinalDot);
-                setCysc(mglString);
-                break;
-            }
-            case NumberInputs.Height: {
-                let cmString = '';
-                let inString = '';
-                if (unit === Units.height.cm) {
-                    let cm = inputValue;
-                    let inch = inputValue * conversions.height.cmToIn;
-
-                    cmString = calculatedValueToString(cm, true, hasFinalDot);
-                    inString = calculatedValueToString(inch, false, hasFinalDot);
-                }
-                if (unit === Units.height.in) {
-                    let cm = inputValue * conversions.height.inToCm;
-                    let inch = inputValue;
-                    
-                    cmString = calculatedValueToString(cm, false, hasFinalDot);
-                    inString = calculatedValueToString(inch, true, hasFinalDot);
-                }
-
-                setHeight({ cm: cmString, in: inString });
-                break;
-            }
-        }
+        const newValues = values.slice();
+        newValues[fieldIndex] = value;
+        setValues(newValues);
     }
 
-    const handleGenderChange = (input: number | string) =>
+    const handleUnitChange = (unitIndex: string, fieldIndex: number) => {
+        const newUnitIndices = unitIndices.slice();
+        newUnitIndices[fieldIndex] = unitIndex;
+        setUnitIndices(newUnitIndices);
+    }
+
+    const handleGenderChange = (input: string) =>
     {
-        if (typeof(input) === 'string') {
-            setGender(Number.parseInt(input as string));
-        } else {
-            setGender(input as number);
-        }
+        setGender(input);
     }
 
     const handleClearAll = () => {
-        setCrea({ umoll: '', mgdl: '' });
-        setUrea({ mmoll: '', mgdl: '' });
-        setCysc('');
-        setHeight({ cm: '', in: '' });
+        setValues(Array(Fields.length).fill(''));
         setGender('');
+        setUnitIndices(Array(Fields.length).fill('0'));
     }
 
     const ckid = useMemo(() => {
-        if (typeof(gender) !== 'number')
-            return 0;
-        const vGender = gender as number;
-
-        const vCrea = Number.parseFloat(crea.mgdl) || 0;
-        const vUrea = Number.parseFloat(urea.mgdl) || 0;
-        const vCysc = Number.parseFloat(cysc) || 0;
-        const vHeight = Number.parseFloat(height.cm) / 100 || 0;
+        const valueGender = Number.parseInt(gender);
         
-        const result = 39.1 * Math.pow(vHeight / vCrea, 0.516) * Math.pow(1.8 / vCysc, 0.294) * Math.pow(30 / vUrea, 0.169) * Math.pow(vHeight / 1.4, 0.188) * Math.pow(1.099, vGender) || 0;
-        console.log(result);
-        return result.toFixed(2);//result < 75 ? result.toFixed(2) : '> 75';        
-    }, [crea, urea, cysc, height, gender]);
+        const creaIndex = fieldIndices.crea;
+        const ureaIndex = fieldIndices.urea;
+        const cyscIndex = fieldIndices.cysc;
+        const heightIndex = fieldIndices.height;
+
+        const crea = getConvertedValue(values[creaIndex], creaIndex, unitIndices[creaIndex]) || 0;
+        const urea = getConvertedValue(values[ureaIndex], ureaIndex, unitIndices[ureaIndex]) || 0;
+        const cysc = getConvertedValue(values[cyscIndex], cyscIndex, unitIndices[cyscIndex]) || 0;
+        const height = getConvertedValue(values[heightIndex], heightIndex, unitIndices[heightIndex]) / 100 || 0;
+        
+        const result = 39.1 * Math.pow(height / crea, 0.516) * Math.pow(1.8 / cysc, 0.294) * Math.pow(30 / urea, 0.169) * Math.pow(height / 1.4, 0.188) * Math.pow(1.099, valueGender) || 0;
+
+        return result < 75 ? result.toFixed(2) : '> 75';
+    }, [values, unitIndices, gender]);
 
     const bse = useMemo(() => {
-        const vCrea = Number.parseFloat(crea.mgdl) || 0;
-        const vHeight = Number.parseFloat(height.cm) || 0;
+        const creaIndex = fieldIndices.crea;
+        const heightIndex = fieldIndices.height;
 
-        const result = 0.413 * vHeight / vCrea || 0;
+        const crea = getConvertedValue(values[creaIndex], creaIndex, unitIndices[creaIndex]) || 0;
+        const height = getConvertedValue(values[heightIndex], heightIndex, unitIndices[heightIndex]) || 0;
+
+        const result = 0.413 * height / crea || 0;
         return result.toFixed(2);
-    }, [crea, height]);
+    }, [values, unitIndices]);
+
+    const numberInputs = Fields.map((field, index) => {
+        return (
+            <UnitSelectInput
+                key={field.id}
+                label={field.label}
+                value={values[index]}
+                units={field.units}
+                unitIndex={unitIndices[index]}
+                onChange={(e) => handleValueChange((e.target as HTMLInputElement).value, index)}
+                onUnitChange={(e) => handleUnitChange((e.target as HTMLInputElement).value, index)}
+            />
+        )
+    });
 
     return (
-        <ThemeProvider theme={darkMode ? themes.dark : themes.light}>
+        <ThemeProvider theme={theme}>
             <CssBaseline />
             <AppBar enableColorOnDark>
                 <Toolbar>
@@ -194,86 +137,19 @@ function App() {
                 <Stack spacing={4}>
                     <Paper elevation={2} sx={{ p: 4 }}>
                         <Stack spacing={2}>
-                            <Typography variant="h5">Measured values:</Typography>
-                            <UnitSelectInput
-                                id="crea"
-                                label="Creatinine"
-                                value={crea.umoll}
-                                units={Units.crea}
-                                selectedUnit={creaUnit}
-                                onChange={(e) => console.log((e.target as HTMLInputElement).value)}
-                                onUnitChange={(e) => console.log((e.target as HTMLButtonElement).value)}
-                            />
-                            <Stack direction="row" spacing={2} alignItems="center">
-                                <TextField
-                                    id="crea_umol_l"
-                                    label="Creatinine"
-                                    value={crea.umoll}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Crea, Units.umol)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">µmol/l</InputAdornment>}} 
-                                />
-                                <CompareArrowsIcon />
-                                <TextField
-                                    id="crea_mg_dl"
-                                    label="Creatinine"
-                                    value={crea.mgdl}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Crea, Units.mgdl)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">mg/dl</InputAdornment>}}
-                                />
-                            </Stack>
-                            <Stack direction="row" spacing={2} alignItems="center">
-                                <TextField
-                                    id="urea_mmol_l"
-                                    label="BUN"
-                                    value={urea.mmoll}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Urea, Units.mmol)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">mmol/l</InputAdornment>}} />
-                                <CompareArrowsIcon />
-                                <TextField
-                                    id="urea_mg_dl"
-                                    label="BUN"
-                                    value={urea.mgdl}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Urea, Units.mgdl)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">mg/dl</InputAdornment>}}
-                                />
-                            </Stack>
-                            <TextField
-                                id="cysc_mg_l"
-                                label="Cystatin C"
-                                value={cysc}
-                                onChange={(e) => handleChange(e.target.value, NumberInputs.CysC, Units.mgl)}
-                                InputProps={{endAdornment: <InputAdornment position="end">mg/l</InputAdornment>}}
-                            />
-                            <Stack direction="row" spacing={2} alignItems="center">
-                                <TextField
-                                    id="height_cm"
-                                    label="Height"
-                                    value={height.cm}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Height, Units.cm)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">cm</InputAdornment>}}
-                                />
-                                <CompareArrowsIcon />
-                                <TextField
-                                    id="height_in"
-                                    label="Height"
-                                    value={height.in}
-                                    onChange={(e) => handleChange(e.target.value, NumberInputs.Height, Units.in)}
-                                    InputProps={{endAdornment: <InputAdornment position="end">in</InputAdornment>}}
-                                />
-                            </Stack>
                             <FormControl>
-                                <InputLabel id="gender-label">Gender</InputLabel>
-                                <Select
+                                <FormLabel sx={{ '&.Mui-focused': { color: `${theme.palette.text.secondary}` } }}>Gender</FormLabel>
+                                <RadioGroup
                                     id="gender"
-                                    labelId="gender-label"
-                                    label="Gender"
                                     value={gender}
                                     onChange={(e) => handleGenderChange(e.target.value)}
+                                    row
                                 >
-                                    <MenuItem value={0}>Female</MenuItem>
-                                    <MenuItem value={1}>Male</MenuItem>
-                                </Select>
+                                    <FormControlLabel value="0" control={<Radio />} label="Female" />
+                                    <FormControlLabel value="1" control={<Radio />} label="Male" />
+                                </RadioGroup>
                             </FormControl>
+                            {numberInputs}
                             <Button
                                 variant="outlined"
                                 color={darkMode ? "secondary" : "primary"}

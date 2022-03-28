@@ -9,12 +9,16 @@ i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
+        backend: {
+            loadPath: '/i18n/{{lng}}.json'
+        },
         fallbackLng: 'en',
         debug: true,
 
         interpolation: {
             escapeValue: false,
-        }
+        },
+        compatibilityJSON: 'v3'
     });
 
 export default i18n;

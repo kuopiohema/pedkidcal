@@ -29,7 +29,6 @@ import * as themes from './theme';
 import { Fields, fieldIndices, getConvertedValue } from './fields';
 import UnitSelectInput from './components/UnitSelectInput';
 import { LanguageSelect } from './components/LanguageSelect';
-//import { LanguageSelect } from './components/LanguageSelect';
 
 function App() {
     // I18N
@@ -112,7 +111,7 @@ function App() {
         return (
             <UnitSelectInput
                 key={field.id}
-                label={field.label}
+                label={t(`fields.${field.id}`)}
                 value={values[index]}
                 units={field.units}
                 unitIndex={unitIndices[index]}
@@ -121,6 +120,8 @@ function App() {
             />
         )
     });
+
+    const title = darkMode ? t('ui.lightMode') : t('ui.darkMode');
 
     return (
         <ThemeProvider theme={theme}>
@@ -131,9 +132,9 @@ function App() {
                     <Typography variant="h6" component="div" sx={{ paddingLeft: '10px', flexGrow: 1 }}>
                         {t('title')}
                     </Typography>
-                    
-                    <Tooltip title={`Switch to ${darkMode ? 'light' : 'dark'} mode`}>
-                        <IconButton size="large" edge="start" color="inherit" onClick={() => setDarkMode(!darkMode)}>
+                    <LanguageSelect />
+                    <Tooltip title={title}>
+                        <IconButton size="large" color="inherit" onClick={() => setDarkMode(!darkMode)}>
                             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
                         </IconButton>
                     </Tooltip>
@@ -144,17 +145,16 @@ function App() {
                 <Stack spacing={4}>
                     <Paper elevation={2} sx={{ p: 4 }}>
                         <Stack spacing={2}>
-                            <LanguageSelect />
                             <FormControl>
-                                <FormLabel sx={{ '&.Mui-focused': { color: `${theme.palette.text.secondary}` } }}>Gender</FormLabel>
+                                <FormLabel sx={{ '&.Mui-focused': { color: `${theme.palette.text.secondary}` } }}>{t('fields.gender.label')}</FormLabel>
                                 <RadioGroup
                                     id="gender"
                                     value={gender}
                                     onChange={(e) => handleGenderChange(e.target.value)}
                                     row
                                 >
-                                    <FormControlLabel value="0" control={<Radio />} label="Female" />
-                                    <FormControlLabel value="1" control={<Radio />} label="Male" />
+                                    <FormControlLabel value="0" control={<Radio />} label={t('fields.gender.female') as string} />
+                                    <FormControlLabel value="1" control={<Radio />} label={t('fields.gender.male') as string} />
                                 </RadioGroup>
                             </FormControl>
                             {numberInputs}
@@ -165,28 +165,37 @@ function App() {
                                 sx={{ alignSelf: 'flex-start' }}
                                 onClick={handleClearAll}
                             >
-                                Clear all
+                                {t('ui.clearAll')}
                             </Button>
                         </Stack>
                     </Paper>
                     <Paper elevation={2} sx={{ p: 4 }}>
                         <Stack spacing={2}>
-                            <Typography variant="h5">Estimated glomerular filtration rate (eGFR):</Typography>
+                            <Typography variant="h5">{t('results.heading')}:</Typography>
                             <Typography variant="body1">
-                                CKiD Schwartz Equation<sup>1</sup>: <b>{ckid} ml/min/1.73 m<sup>2</sup></b>
+                                {t('results.ckid')}<sup>1</sup>: <b>{ckid} ml/min/1.73 m<sup>2</sup></b>
                             </Typography>
                             <Typography variant="body1">
-                                Bedside Schwartz Equation<sup>2</sup>: <b>{bse} ml/min/1.73 m<sup>2</sup></b>
+                                {t('results.bse')}<sup>2</sup>: <b>{bse} ml/min/1.73 m<sup>2</sup></b>
                             </Typography>
                             <div />
                             <Typography variant="body2">
-                                <sup>1</sup>eGFR<sub>ml/min/1.73 m<sup>2</sup></sub> = 39.1 x (height<sub>m</sub> / creatinine<sub>mg/dl</sub>)<sup>0.516</sup> x (1.8 / cystatin C<sub>mg/l</sub>)<sup>0.294</sup> x (30 / BUN<sub>mg/dl</sub>)<sup>0.169</sup> x (height<sub>m</sub> / 1.4)<sup>0.188</sup> x 1.099 [only if male]
+                                <sup>1</sup>eGFR
+                                <sub>ml/min/1.73 m<sup>2</sup></sub>
+                                = 39.1 x ({t('fields.height')}<sub>m</sub>
+                                / {t('fields.crea')}<sub>mg/dl</sub>)<sup>0.516</sup>
+                                x (1.8 / {t('fields.cysc')}<sub>mg/l</sub>)<sup>0.294</sup>
+                                x (30 / {t('fields.urea')}<sub>mg/dl</sub>)<sup>0.169</sup>
+                                x ({t('fields.height')}<sub>m</sub> / 1.4)<sup>0.188</sup>
+                                x 1.099 [{t('results.onlyIfMale')}]
                             </Typography>
                             <Typography variant="body2">
-                                <sup>2</sup>eGFR<sub>ml/min/1.73 m<sup>2</sup></sub> = 0.413 x height<sub>cm</sub> / creatinine<sub>mg/dl</sub>
+                                <sup>2</sup>eGFR<sub>ml/min/1.73 m<sup>2</sup></sub>
+                                = 0.413 x {t('fields.height')}<sub>cm</sub>
+                                / {t('fields.crea')}<sub>mg/dl</sub>
                             </Typography>
                             <div />
-                            <Typography variant="h6">Sources:</Typography>
+                            <Typography variant="h6">{t('results.sources')}</Typography>
                             <Typography variant="body2">
                                 <Link href="https://pubmed.ncbi.nlm.nih.gov/19158356/" target="_blank" rel="noreferrer noopener">Schwartz et al. New equations to estimate GFR in children with CKD. J Am Soc Nephrol. 2009 Mar;20(3):629-37</Link><br />
                                 <Link href="https://pubmed.ncbi.nlm.nih.gov/20652327/" target="_blank" rel="noreferrer noopener">Staples et al. Validation of the revised Schwartz estimating equation in a predominantly non-CKD population. Pediatr Nephrol. 2010 Nov;25(11):2321-6</Link>

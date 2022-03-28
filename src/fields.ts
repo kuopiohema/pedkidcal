@@ -6,14 +6,12 @@ export interface Unit {
 
 export interface Field {
     id: string,
-    label: string,
     units: Unit[]
 }
 
 export const Fields: Field[] = [
     {
         id: 'crea',
-        label: 'Creatinine',
         units: [
             {
                 id: 'µmol',
@@ -29,7 +27,6 @@ export const Fields: Field[] = [
     },
     {
         id: 'urea',
-        label: 'BUN',
         units: [
             {
                 id: 'mmol',
@@ -45,7 +42,6 @@ export const Fields: Field[] = [
     },
     {
         id: 'cysc',
-        label: 'Cystatin C',
         units: [
             {
                 id: 'mg',
@@ -56,7 +52,6 @@ export const Fields: Field[] = [
     },
     {
         id: 'height',
-        label: 'Height',
         units: [
             {
                 id: 'cm',

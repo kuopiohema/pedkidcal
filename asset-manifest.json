@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/pedkidcal/static/css/main.e7282484.css",
+    "main.js": "/pedkidcal/static/js/main.167ec1a8.js",
+    "static/js/787.62e69e8f.chunk.js": "/pedkidcal/static/js/787.62e69e8f.chunk.js",
+    "index.html": "/pedkidcal/index.html",
+    "static/media/getFetch.cjs": "/pedkidcal/static/media/getFetch.c780682470504fffbd04.cjs",
+    "main.e7282484.css.map": "/pedkidcal/static/css/main.e7282484.css.map",
+    "main.167ec1a8.js.map": "/pedkidcal/static/js/main.167ec1a8.js.map",
+    "787.62e69e8f.chunk.js.map": "/pedkidcal/static/js/787.62e69e8f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e7282484.css",
+    "static/js/main.167ec1a8.js"
+  ]
+}

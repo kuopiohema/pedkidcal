@@ -105,7 +105,7 @@ function App() {
         return (
             <UnitSelectInput
                 key={field.id}
-                label={t(`fields.${field.id}`)}
+                label={t(`data.fields.${field.id}`)}
                 value={values[index]}
                 units={field.units}
                 unitIndex={unitIndices[index]}

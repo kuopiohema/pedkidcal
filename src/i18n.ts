@@ -10,16 +10,15 @@ i18n
     .use(initReactI18next)
     .init({
         backend: {
-            loadPath: '/i18n/{{lng}}.yaml',
+            loadPath: process.env.PUBLIC_URL + '/i18n/{{lng}}.yaml',
             parse: data => yaml.parse(data)
         },
         fallbackLng: 'en',
-        debug: false,
+        debug: process.env.NODE_ENV !== "production",
 
         interpolation: {
             escapeValue: false,
-        },
-        compatibilityJSON: 'v3'
+        }
     });
 
 export default i18n;

@@ -1,0 +1,27 @@
+title: "PedKidCal - Pediatric Kidney Function Calculator"
+ui:
+  buttons:
+    darkMode: "Switch to dark mode"
+    lightMode: "Switch to light mode"
+    selectLanguage: "Select language"
+  messages:
+    error: "Error"
+    translationError: "Error loading translation data!"
+data:
+  buttons:
+    clearAll: "Clear all"
+  fields:
+    gender:
+      label: "Gender"
+      female: "Female"
+      male: "Male"
+    crea: "Creatinine"
+    urea: "BUN"
+    cysc: "Cystatin C"
+    height: "Height"
+  results:
+    heading: "Estimated glomerular filtration rate (eGFR)"
+    ckid: "CKiD Schwartz Equation"
+    bse: "Bedside Schwartz Equation"
+    onlyIfMale: "only if male"
+    sources: "Sources"

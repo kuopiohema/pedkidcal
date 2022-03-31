@@ -43,12 +43,13 @@ const languages: Language[] = [
 
 function AppHeader(props: AppHeaderProps) {
     const { t, i18n } = useTranslation();
+    const { setDarkMode } = props;
 
     // Theme Toggle
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     useEffect(() => {
-        props.setDarkMode(prefersDarkMode);
-    }, [prefersDarkMode]);
+        setDarkMode(prefersDarkMode);
+    }, [setDarkMode, prefersDarkMode]);
 
     // Language Select
     const languageButton = useRef<HTMLButtonElement>(null);

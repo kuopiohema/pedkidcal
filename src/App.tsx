@@ -39,7 +39,7 @@ function App() {
     const [darkMode, setDarkMode] = useState(false);
     useEffect(() => { setDarkMode(prefersDarkMode); }, [prefersDarkMode]);
 
-    const theme = useMemo(() => darkMode ? themes.dark : themes.light, [darkMode]);
+    const theme = darkMode ? themes.dark : themes.light;
 
     // Number inputs
     const [values, setValues] = useState(Array(Fields.length).fill(''));
@@ -121,8 +121,6 @@ function App() {
         )
     });
 
-    const title = darkMode ? t('ui.lightMode') : t('ui.darkMode');
-
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -133,7 +131,7 @@ function App() {
                         {t('title')}
                     </Typography>
                     <LanguageSelect />
-                    <Tooltip title={title}>
+                    <Tooltip title={(darkMode ? t('ui.lightMode') : t('ui.darkMode')) as string}>
                         <IconButton size="large" color="inherit" onClick={() => setDarkMode(!darkMode)}>
                             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
                         </IconButton>

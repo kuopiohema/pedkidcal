@@ -15,9 +15,9 @@ data:
       label: "Sukupuoli"
       female: "Tyttö"
       male: "Poika"
-    crea: "Kreatiniini"
+    crea: "Krea"
     urea: "Urea"
-    cysc: "Kystatiini C"
+    cysc: "KysC"
     height: "Pituus"
   results:
     heading: "Arvioitu glomerulussuodatusnopeus (eGFR)"
